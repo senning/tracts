@@ -1,70 +1,30 @@
-# Getting Started with Create React App
+# Setup
+These instructions assume you have git and Python installed and all commands should be entered in a terminal.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+1. Extract the project from the archive
+2. Enter the project `cd tracts`
 
-## Available Scripts
+## Start the backend
+ 
+1. `cd backend`
+2. Enter the python virtual environment `. venv/bin/activate` 
+3. Run the `sh prod.sh`
 
-In the project directory, you can run:
+_Note_: The frontend requires that the backend is served at `http://localhost:5000`. This is very likely working if you see `Running on http://127.0.0.1:5000` in the terminal.
 
-### `npm start`
+## Start the frontend
+1. Returning to the project root, install dependencies: `yarn` or `npm install`
+2. Start the frontend: `yarn start` or `npm run start`
+3. The application should launch in your web browser
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+# Notes
+- The details are shown in a view rather than a separate page. This makes it easier to switch to other census tracts and avoided the need for routing. However, the TractDetails component can also be used on a separate page since it only requires the primary key as a prop
+- The tract list items include the name of the county encompassing the census tract, and the percentage of area covered by land vs water. This adds a bit of visual interest and helps with distinguishing between tracts given the generic naming scheme while making use only of available data.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+# Potential improvements
+- The API hostname should be configured in a React environment variable, not hard coded
+- Rendering the full list of census tracts causes performance issues and wouldn't scale to a longer list (for example, all census tracts in the US). The backend should return results in smaller pages, and the client should either only show the particular page or should virtualize the list so React only renders a subset of results.
+- The layout doesn't elegantly support screens narrower than 800px. One way to handle small screens would be to move the list off-screen when the detail view is shown (like a Drawer in Material UI) with a button to show it
+- The map is hard-coded to show the state of Minnesota. It should either be zoomed in on the selected census tract or show the correct state for the census tract, depending on product objectives. 
+- TractDetails mixes logic and presentation. Refactoring it into separate container and presentation components makes them easier to reuse, test, and understand. Similarly, the tract list is currently mixed into the main App but should be refactored into a container.
+- In React 18 dev mode, useEffects fire twice on load and the cleanup on the first fire currently triggers the request error message. The error message should only show for a fetch error, not an abort
