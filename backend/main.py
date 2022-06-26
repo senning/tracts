@@ -1,9 +1,11 @@
+from typing import OrderedDict
 from flask import (
     Flask,
     abort,
 )
 from flask_cors import CORS
 import sqlite3
+import fiona
 
 app = Flask(__name__)
 CORS(app)
@@ -46,29 +48,44 @@ def list_tracts():
 
 @app.route("/tracts/<int:fid>")
 def get_tract(fid):
-    columns = ['fid', 'state', 'county', 'name','areaLand','areaWater','lat','lon']
-    conn = get_db_connection()
-    tract = conn.execute(f'''
-    SELECT 
-        fid,
-        STATEFP,
-        COUNTYFP,
-        NAMELSAD,
-        ALAND,
-        AWATER,
-        INTPTLAT,
-        INTPTLON
-    FROM
-        tracts
-    WHERE
-        fid = {fid}
-    ''').fetchone()
-    conn.close()
-    
-    if tract is None:
-      abort(404)
-
-    result = dict(zip(columns, tract))
-    return {
-        "data": result,
+  with fiona.open('tracts.gpkg', layer='tracts') as src:
+    columns = OrderedDict([
+        ('state', 'STATEFP'),
+        ('county', 'COUNTYFP'),
+        ('name', 'NAMELSAD'),
+        ('areaLand', 'ALAND'),
+        ('areaWater', 'AWATER'),
+      ])
+    result = {
+      'fid': fid,
     }
+    result['coordinates'] = src[fid]['geometry']['coordinates']
+    print(src[fid]['properties'])
+    for column in columns.keys():
+      result[column] = src[fid]['properties'][columns[column]]
+
+    return {
+      "data": result
+    }
+
+# @app.route("/tracts-fiona/<int:fid>")
+# def get_fiona_tract(fid):
+#   with fiona.open('tracts.gpkg', layer='tracts') as src:
+#     columns = OrderedDict([
+#         ('state', 'STATEFP'),
+#         ('county', 'COUNTYFP'),
+#         ('name', 'NAMELSAD'),
+#         ('areaLand', 'ALAND'),
+#         ('areaWater', 'AWATER'),
+#       ])
+#     result = {
+#       'fid': fid,
+#     }
+#     result['coordinates'] = src[fid]['geometry']['coordinates']
+#     print(src[fid]['properties'])
+#     for column in columns.keys():
+#       result[column] = src[fid]['properties'][columns[column]]
+
+#     return {
+#       "data": result
+#     }
