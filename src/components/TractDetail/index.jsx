@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { styled } from '@mui/material/styles'
 import {
   Card,
@@ -7,6 +7,12 @@ import {
   Typography,
   Grid,
 } from '@mui/material'
+import {
+  MapContainer,
+  TileLayer,
+  Polygon,
+  useMap,
+} from 'react-leaflet';
 
 import counties from '../../constants/counties'
 
@@ -21,12 +27,17 @@ const Text = styled(Typography)(({ theme }) => ({
   display: 'inline',
 }));
 
+const StyledMapContainer = styled(MapContainer)`
+  aspect-ratio: 1;
+`
+
 const TractDetails = ({
   fid
 }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const [tract, setTract] = useState({});
+  const mapRef = useRef();
 
   useEffect(() => {
     const controller = new AbortController();
@@ -38,8 +49,17 @@ const TractDetails = ({
     )
       .then(res => res.json())
       .then(data => {
+
+        //use latlng for coordinates
+        const coordinates = data?.data?.coordinates[0].map(
+          latlng => latlng.reverse()
+        )
+
         setIsError(false);
-        setTract(data?.data);
+        setTract({
+          ...data?.data,
+          coordinates,
+        });
       })
       .catch(() => {
         setIsError(true)
@@ -101,6 +121,24 @@ const TractDetails = ({
                 </Text>
               </Grid>
             </Grid>
+            <StyledMapContainer
+              bounds={[
+                [49.1106, -97.5807],
+                [43.4854, -91.2131]
+              ]}
+            >
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+              <Polygon 
+                pathOptions={{
+                  color: '#ff9800',
+                  fill: '#ff980033'
+                }}
+                positions={tract?.coordinates}
+              />
+            </StyledMapContainer>
           </>
         )}
       </CardContent>

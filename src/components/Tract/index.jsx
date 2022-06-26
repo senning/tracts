@@ -17,8 +17,8 @@ const Separator = () => (
 )
 
 const AreaIndicator = styled(LinearProgress)(({ theme }) => ({
-  height: 10,
-  borderRadius: 5,
+  height: 2,
+  borderRadius: 0,
   [`&.${linearProgressClasses.colorPrimary}`]: {
     backgroundColor: theme.palette.primary[theme.palette.mode === 'light' ? 'main' : 'dark'],
   },
