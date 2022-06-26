@@ -7,7 +7,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const [tracts, setTracts] = useState([]);
-  const [activeTract, setActiveTract] = useState(10);
+  const [activeTract, setActiveTract] = useState();
 
   useEffect(() => {
     const controller = new AbortController();
@@ -40,6 +40,7 @@ function App() {
       bgcolor='grey.50'
       gap={2}
       p={2}
+      alignItems='flex-start'
     >
       {
         isLoading && <CircularProgress />

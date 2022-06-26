@@ -75,6 +75,10 @@ const TractDetails = ({
     <Card sx={{
       width: '50%',
       maxWidth: '30em',
+      position: 'sticky',
+      top: 0,
+      maxHeight: '80vh',
+      overflowY: 'auto',
     }}>
       <CardContent>
         { isLoading && <CircularProgress /> }
