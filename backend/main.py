@@ -2,10 +2,11 @@ from flask import (
     Flask,
     abort,
 )
+from flask_cors import CORS
 import sqlite3
 
-
 app = Flask(__name__)
+CORS(app)
 
 def get_db_connection():
     conn = sqlite3.connect("tracts.gpkg")
@@ -31,6 +32,7 @@ def list_tracts():
         INTPTLON
     FROM
         tracts
+    LIMIT 0,5
     ''').fetchall()
     conn.close()
 
@@ -38,7 +40,7 @@ def list_tracts():
     for row in tracts:
         results.append(dict(zip(columns, row)))
     return {
-        "objects": results
+        "tracts": results
     }
 
 
